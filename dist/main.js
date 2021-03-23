@@ -94,7 +94,7 @@
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var _math_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./math.js */ \"./src/math.js\");\n//가져올 때는 import 키워드를 통해 가져온다.\r\n// 모든 export를 math로 가져올 수도 있고, \"sum만\" 가져올 수도 있다.\r\n\r\n// import { sum } from './math.js'\r\n\r\nconsole.log(_math_js__WEBPACK_IMPORTED_MODULE_0__[\"sum\"](1, 2));\n\n//# sourceURL=webpack:///./src/app.js?");
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var _math_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./math.js */ \"./src/math.js\");\n//가져올 때는 import 키워드를 통해 가져온다.\n// 모든 export를 math로 가져올 수도 있고, \"sum만\" 가져올 수도 있다.\n\n// import { sum } from './math.js'\n\nconsole.log(_math_js__WEBPACK_IMPORTED_MODULE_0__[\"sum\"](1, 2));\n\n//# sourceURL=webpack:///./src/app.js?");
 
 /***/ }),
 
@@ -106,7 +106,7 @@ eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var _mat
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"sum\", function() { return sum; });\n\r\n//내보낼 때는 export\r\nfunction sum(a,b) {\r\n    return a + b;\r\n  }\r\n\r\n  \n\n//# sourceURL=webpack:///./src/math.js?");
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"sum\", function() { return sum; });\n\n//내보낼 때는 export\nfunction sum(a,b) {\n    return a + b;\n  }\n\n  \n\n//# sourceURL=webpack:///./src/math.js?");
 
 /***/ })
 
