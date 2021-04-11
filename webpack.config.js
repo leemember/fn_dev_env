@@ -18,8 +18,17 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.js$/,
-        use: [path.resolve("./my-webpack-loader.js")],
+        test: /\.css$/,
+        use: ["style-loader", "css-loader"],
+      },
+      {
+        test: /\.(jpg|png|gif|svg)$/,
+        loader: "url-loader",
+        options: {
+          publicPath: "./dist/",
+          name: "[name].[ext]?[hash]",
+          limit: 20000, //파일 용량도 설정이 가능하다 2kb
+        },
       },
     ],
   },

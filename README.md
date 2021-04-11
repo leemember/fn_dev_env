@@ -143,7 +143,7 @@ module.exports = function myWebpackLoader(content) {
 };
 ```
 
-> 모듈은 함수형태로 만들어진다. / 읽었던 파일 내용은 그대로 리턴해준다.
+> 모듈은 함수형태로 만들어진다. 읽었던 파일 내용은 그대로 리턴해준다.
 
 웹팩에 로더는 각 파일을 처리하기 위한 것
 
@@ -157,8 +157,74 @@ module.exports = function myWebpackLoader(content) {
     ],
   },
 ```
+
 처리할 파일에 이렇게 정규식표현으로 처리할 파일을 명시해주자
 
 ## 자주사용하는 로더
 
-### css-loader
+### 1. css-loader
+
+> $npm install css-loader
+설치하기
+만약 웹팩에서 css 로더를 사용하고 싶다면, 이 파일이 Js로 변환될 때 style-loader도 같이 설치해줘야한다.
+> $npm install style-loader
+
+```
+  module: {
+    rules: [
+      {
+        test: /\.css$/,
+        use: ["style-loader", "css-loader"],
+      },
+    ],
+  },
+```
+
+나중에 설치한거를 먼저 불러준다.
+
+### 2. 이미지로더 css-loader
+
+> $npm install file-loader
+
+설치 후에 npm run build를 해주면 dist 폴더안에 들어있는 이미지명이 해시값으로 변경된다. 웹팩은 빌더할 때마다 유니크한 값을 생성하는데 그게 바로 .jpg 확장자 앞에 있는 해시값이다.
+
+```
+ {
+        test: /\.jpg$/,
+        loader: "file-loader",
+        options: {
+          pubilcPath: "./dist/",
+          name: "[name].[ext]?[hash]",
+        },
+      },
+```
+
+index.html 파일로 봤을 때 이미지 경로가 src로 되어있어서 dist에 새로운 해시값으로 변경된 이미지 파일이 브라우저에 안담기는 것이다. 그래서 웹팩 설정을 이렇게 해줘야한다! loader이름을 file-loader로 설정한 후 options에 pubilcPath 설정해준다. **publicPath란 ?** 파일로더가 처리하는 파일을 모듈로 사용했을 때 경로 앞에 추가되는 문자열이다.
+아웃풋을 dist로 설정했으니 publicPath도 동일하게 dist로 설정해주자.
+
+**name**이란 옵션은 name: "[name].[ext]?[hash]"을 주는데 이 name 옵션은 파일로더가 아웃풋에 호출 됐을 때 사용하는 것이다. 여기서 [name]은 원본 파일명을 뜻하고 .[ext]는 확장자를 뜻한다. ?[hash] 매번 달라지는 해시값을 이용. (쿼리스트링)
+
+### 3. 여러 이미지 사용시 Data URI
+
+- 사용하는 이미지 갯수가 많다면 네트워크 리소스를 사용하는 부담이 있고 사이트 성능에 영향을 줄 수 있다. 한 페이지에서 작은 이미지를 여러개 사용한다면 Data URI Scheme를 이용하는 방법이 더 낫다.
+
+```
+npm install url-loader
+```
+
+```
+{
+        test: /\.(jpg|png|gif|svg)$/,
+        loader: "url-loader",
+        options: {
+          publicPath: "./dist/",
+          name: "[name].[ext]?[hash]",
+          limit: 20000,
+        },
+      },
+```
+
+만약 jpg 뿐만 아니라 다른 확장자 파일들도 빌드해주고 싶다면 ( ) 소괄호 안에다가 여러 종류의 확장자를 적어준다. | 는 또는 이란 뜻이다.
+여기서 (jpg|png|gif|svg)에 | 사이 공백 있으면 안된다. 띄어쓰기 금지! <br>
+
+그리고 limit으로 파일 용량도 설정이 가능하다 20000은 20kb를 의미한다. url-loader가 파일들을 처리할 때 20kb 미만은 url-loader로해서 bath 64로 변환처리를 해준다. 그 이상이면 file-loader로 실행되어 파일을 복사해준다. (20kb보다 크면 dist 폴더에 복사됨!)

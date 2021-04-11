@@ -10,7 +10,11 @@
   "author": "leehyunju",
   "license": "ISC",
   "dependencies": {
-    "react": "^17.0.1"
+    "css-loader": "^5.2.1",
+    "file-loader": "^6.2.0",
+    "react": "^17.0.1",
+    "style-loader": "^2.0.0",
+    "url-loader": "^4.1.1"
   },
   "devDependencies": {
     "webpack": "^4.46.0",
