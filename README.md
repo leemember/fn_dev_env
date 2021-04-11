@@ -283,3 +283,91 @@ module.exports = MyWebpackPlugin;
 ## 자주 사용하는 플러그인
 
 ### 1. BannerPlugin
+
+> 결과물에 빌드 정보나 커밋 버전 같은 걸 추가할 수 있다. 배포 했을 때 배포가 잘 됐는지 이를 통해 확인한다.
+
+```
+class MyWebpackPlugin {
+  apply(compiler) {
+    //종료될 때 실행되는 플러그인
+    // compiler.hooks.done.tap("My Plugin", (stats) => {
+    //   console.log("My Plugin: done");
+    // });
+
+    compiler.plugin("emit", (compilation, callback) => {
+      const source = compilation.assets["main.js"].source();
+
+      compilation.assets["main.js"].source = () => {
+        const banner = [
+          "/**",
+          " * 이것은 배너 플러그인이 처리한 결과입니다.",
+          " * Build Date : 2021-04-11",
+          " */",
+        ].join("\n");
+        return banner + "\n\n" + source;
+      };
+      callback();
+    });
+  }
+}
+
+module.exports = MyWebpackPlugin;
+
+```
+
+이렇게 했을 시 dist/main.js에 가면 내가 입력한 주석처리한 내용들이 나타난다.
+
+### 2.DefinePlugin
+
+> 어플리케이션은 개발환경과 운영환경으로 나눠서 운영한다. 환경에 따라 API 서버 주소가 다를 수 있다. 같은 소스 코드를 두 환경에 배포하기 위해서 이런 환경 의존적인 정보를 소스가 아닌 곳에 관리하는 게 좋다. 이러한 환경을 제공하기 위해 DefinePlugin를 제공한다.
+
+### 3.HtmlTemPlatePlugin
+
+> Html 파일을 후처리하는데 사용한다. 빌드 타임의 값을 넣거나 코드를 압축할 수 있다.
+
+```
+npm install html-webpack-plugin
+```
+
+웹팩의 기본 패키지가 아니라 따로 설치 해주어야한다.
+패키지 설치해주고 버전이 안맞는다면 뒤에 @4 이런식으로 버전에 맞춰 설치해준다. 얘를 사용하면 좀 더 유동적으로 html 을 만들어 낼 수 있다. 개발버전 / 운영버전 두 가지로 관리가능
+
+```
+  <title>Document <%=env %></title>
+```
+
+ejs 문법이다.
+
+```
+    new HtmlWebpackPlugin({
+      template: "./src/index.html",
+      templateParameters: {
+        env: process.env.NODE_ENV === "development" ? "(개발용)" : "",
+      },
+    }),
+```
+
+웹팩환경에 HtmlWebpackPlugin를 이렇게 설정해주면, 개발용 일 때는 개발용이라는 문구가 title에 나오고 아닐 시에는 안뜬다.
+
+```
+ minify: {
+        collapseWhitespace: true, //빈칸 제거
+        removeComments: true, //주석 제거
+      },
+```
+
+minify라는 속성도 있다.
+
+### 4.CleanWebpackPlugin
+
+> 빌드 결과물은 아웃풋 경로에 모이는데 과거 파일이 남아 있을 수 있다. 이전 빌드내용이 덮여 씌여지면 상관 없지만 그렇지 않으면 아웃풋 폴더에 여전히 남아 있을 수 있다. 그래서 이 기능은 빌드 이전 결과물을 제거하는 플러그인이다.
+
+```
+npm install html-webpack-plugin
+```
+
+이 플러그인은 다른 플러그인과 다르게 <code>const { CleanWebpackPlugin } = require("clean-webpack-plugin");</code> 상단에 이렇게 { } 중괄호를 넣어 가져와야한다. defualt로 export 되어있지 않아서임!
+
+### 4.MiniCssExtractPlugin
+
+> 여러 css를 하나 css로 만들어주는 플러그인

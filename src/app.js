@@ -8,3 +8,7 @@ document.addEventListener("DOMContentLoaded", () => {
   <img src="${home}" />
   `;
 });
+
+console.log(process.env.NODE_ENV); // development
+console.log(TWO); // 1+1
+console.log(api.domain);
