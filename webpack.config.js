@@ -1,4 +1,5 @@
 const path = require("path");
+const MyWebpackPlugin = require("./my-webpack-plugin");
 
 module.exports = {
   //모드는 개발용
@@ -32,4 +33,5 @@ module.exports = {
       },
     ],
   },
+  plugins: [new MyWebpackPlugin()],
 };

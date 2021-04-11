@@ -1,3 +1,8 @@
+/**
+ * 이것은 배너 플러그인이 처리한 결과입니다.
+ * Build Date : 2021-04-11
+ */
+
 /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};

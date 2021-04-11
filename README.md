@@ -228,3 +228,58 @@ npm install url-loader
 여기서 (jpg|png|gif|svg)에 | 사이 공백 있으면 안된다. 띄어쓰기 금지! <br>
 
 그리고 limit으로 파일 용량도 설정이 가능하다 20000은 20kb를 의미한다. url-loader가 파일들을 처리할 때 20kb 미만은 url-loader로해서 bath 64로 변환처리를 해준다. 그 이상이면 file-loader로 실행되어 파일을 복사해준다. (20kb보다 크면 dist 폴더에 복사됨!)
+
+---
+
+로더 실습
+
+```
+"scripts": {
+    "build": "webpack --progress"
+  },
+```
+
+웹팩환경에 설정해준 "build": "webpack --progress" 이것 중에 progress는 빌드 상태를 커멘드 라인에 표시해주는 옵션이다.
+
+<br>
+
+## 플러그인
+
+클래스로 정의한다. 플러그인 클래스 이름은 보통 대문자로 시작한다.
+
+```
+class MyWebpackPlugin {
+  apply(compiler) {
+    compiler.hooks.done.tap("My Plugin", (stats) => {
+      console.log("My Plugin: done");
+    });
+  }
+}
+
+module.exports = MyWebpackPlugin;
+```
+
+메소드 이름은 apply로 지정했다.
+
+<br>
+
+### [my-webpack-plugin.js] 라는 플러그인 파일 생성
+
+```
+    compiler.plugin("emit", (compilation, callback) => {
+      const source = compilation.assets["main.js"].source();
+      compilation.assets["main.js"].source = () => {
+        const banner = [
+          "/**",
+          " * 이것은 배너 플러그인이 처리한 결과입니다.",
+          " * Build Date : 2021-04-11",
+          " */",
+        ].join("\n");
+        return banner + "\n\n" + source;
+      };
+      callback();
+```
+
+## 자주 사용하는 플러그인
+
+### 1. BannerPlugin
