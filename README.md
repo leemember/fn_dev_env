@@ -370,4 +370,38 @@ npm install html-webpack-plugin
 
 ### 4.MiniCssExtractPlugin
 
-> 여러 css를 하나 css로 만들어주는 플러그인
+> 여러 css를 하나 css로 만들어주는 플러그인이다. 그리고 이 플러그인은 다른 플러그인과 다르게 modules에서 loader도 설정해줘야한다.
+
+```
+  module: {
+    rules: [
+      {
+        test: /\.css$/,
+        👉🏻 use: [MiniCssExtractPlugin.loader, "css-loader"],
+      },
+      {
+        test: /\.(jpg|png|gif|svg)$/,
+        loader: "url-loader",
+        options: {
+          // publicPath: "./dist/",
+          name: "[name].[ext]?[hash]",
+          limit: 20000, //파일 용량도 설정이 가능하다 2kb
+        },
+      },
+    ],
+  },
+```
+
+## 정리
+
+```
+🐥 BannerPlugin : 번들링 된 결과물 상단에다가 빌드 정보를 추가하는 역할이다. 잘 배포 되었는지 확인해보는 용도
+
+🐥 DefinePlugin : API 서버 주소를 넣음 좋다.
+
+🐥 HtmlTemplatePlugin : 이 플러그인은 동적으로 생성되는 자바스크립트와 css 그리고 빌드 타임에 결정되는 값들을 템플릿 파일에 넣어서 html파일을 동적으로 만들어낸다.
+
+🐥 CleanWebpackPlugin : src경로에 있던 파일들을 빌드하면 dist폴더에 남는다. 근데 src 폴더에 있는 파일을 삭제해도 dist폴더에 남아있다. 그래서 얘는 src폴더와 dist폴더에 있는 값들이 비례하게 빌드할 때마다 dist에 남아있는 파일이나 폴더들을 제거해주는 역할이다.
+
+🐥 MiniCssExtractPlugin : 번들된 자바스크립트 파일에서 css만 따로 뽑아내서 css파일만 만들어 내는 플러그인이다.
+```
