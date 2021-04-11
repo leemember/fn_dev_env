@@ -6,7 +6,6 @@ module.exports = {
   //시작점
   entry: {
     main: "./src/app.js",
-    main2: "./src/app2.js",
   },
   //path: 아웃풋 디렉토리명을 입력한다. (절대경로)
   output: {

@@ -136,3 +136,29 @@ $node_modules/.bin/webpack --mode development --entry ./src/app.js --output dist
 <br>
 
 ## 커스텀 로더 만들기
+
+```
+module.exports = function myWebpackLoader(content) {
+  return content.replace("console.log(", "alert(");
+};
+```
+
+> 모듈은 함수형태로 만들어진다. / 읽었던 파일 내용은 그대로 리턴해준다.
+
+웹팩에 로더는 각 파일을 처리하기 위한 것
+
+```
+  module: {
+    rules: [
+      {
+        test: /\.js$/,
+        use: [path.resolve("./my-webpack-loader.js")],
+      },
+    ],
+  },
+```
+처리할 파일에 이렇게 정규식표현으로 처리할 파일을 명시해주자
+
+## 자주사용하는 로더
+
+### css-loader
