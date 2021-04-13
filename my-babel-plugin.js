@@ -2,17 +2,21 @@
 module.exports = function myBabelPlugin() {
   return {
     visitor: {
-      //path라는 객체를 받게된다.
-      Identifier(path) {
-        const name = path.node.name;
+      VariableDeclaration(path) {
+        console.log("VariableDeclaration() kind", path.node.kind); //const
 
-        // 바벨이 만든 ast  노드 출력
-        console.log("Identifier() name:", name);
-
-        // 변환작업 : 코드 문자열을 역순으로 변환한다.
-        //path에 담긴 node중 name을 (split) 쪼개고 (reverse) 뒤집고 (join) 합치기
-        path.node.name = name.split("").reverse().join("");
+        //const라는 값은 var로 이 플러그인이 변환 해주도록 es6 => es5 문법으로 !
+        if (path.node.kind === "const") {
+          path.node.kind = "var";
+        }
       },
     },
   };
 };
+
+/**
+ *
+ * 결과물 👇🏻
+ * VariableDeclaration() kind const
+ * var alert = msg => window.alert(msg);
+ */

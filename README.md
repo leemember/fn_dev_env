@@ -186,7 +186,7 @@ $npm install @babel/core @babel/cli
 
 마무리로는 출력해준다.
 
-## 플러그인
+## 커스텀 플러그인
 
 > 바벨에 변환을 담당하는 녀석임 ㅎ
 > 커스텀 플러그인을 실행시켜보려면 터미널 창에 <code>npx babel app.js --plugins './my-babel-plugin.js'</code>를 입력해주면 된다. 그럼 결과물은 똑같이 원본 코드랑 같지만 터미널 창에 로그가 찍힌 것을 확인 할 수 있다.
@@ -201,3 +201,190 @@ const alert = msg => window.alert(msg);
 ```
 
 만약 원본코드에 <code>path.node.name = name.split("").reverse().join("");</code> 이렇게 작성한다면 터미널창에는 **const trela = gsm => wodniw.trela(gsm);** 이런식으로 출력된다. 코드를 풀이하자면 path에 담긴 node중 name을 (split) 쪼개고 (reverse) 뒤집고 (join) 합치기
+
+```
+//바벨 커스텀 플러그인 입니다.
+module.exports = function myBabelPlugin() {
+  return {
+    visitor: {
+      VariableDeclaration(path) {
+        console.log("VariableDeclaration() kind", path.node.kind); //const
+
+        //const라는 값은 var로 이 플러그인이 변환 해주도록 es6 => es5 문법으로 !
+        if (path.node.kind === "const") {
+          path.node.kind = "var";
+        }
+      },
+    },
+  };
+};
+
+/**
+ *
+ * 결과물 👇🏻
+ * VariableDeclaration() kind const
+ * var alert = msg => window.alert(msg);
+ */
+
+```
+
+## 플러그인 사용
+
+### 😃 block-scoping
+
+위에 같은 const => var 는 우리가 커스텀 한 것이고 es6 => es5 문법으로 결과를 만들어 주는 것이 <code>block-scoping</code> 플러그인이다. const, let 처럼 블록 스코핑을 따르는 예약어를 함수 스코핑을 사용하는 var로 변경해준다.
+
+```
+$npm install -D @babel/plugin-transform-block-scoping
+```
+
+<code>npx babel app.js --plugins @babel/plugin-transform-block-scoping</code> 를 터미널창에 입력하면
+`var alert = msg => window.alert(msg);` 이렇게 출력된다.
+
+### 😃 transform-arrow-functions
+
+`var alert = msg => window.alert(msg);` var는 브라우저 ie가 인식하는데 => 이 arrow 화살표 함수는 브라우저가 인식하지 못한다. 이거를 또 변환 시켜주는 플러그인을 알아보자.
+
+```
+$npm install -D @babel/plugin-transform-arrow-functions
+```
+
+이 플러그인까지 다 설치됐다면
+<code>npx babel app.js --plugins @babel/plugin-transform-block-scoping --plugins @babel/plugin-transform-arrow-functions</code>
+를 터미널창에 입력해서 결과물을 확인해보면
+
+```
+var alert = function (msg) {
+  return window.alert(msg);
+};
+```
+
+이렇게 arrow 함수가 사라지고 es5 문법으로 변환된 것을 볼 수 있다.
+<br>
+
+### 😃 strict-mode
+
+```
+$npm install @babel/plugin-transform-strict-mode
+```
+
+안전하게 작업하려면 엄격모드를 사용해야한다. 'use strict' 구문을 추가해야 하므로 <code>strict-mode</code> 플러그인 설치해보자. 그리고 위에서 추가한 플러그인까지 모두 npx로 실행해보자.
+<code>npx babel app.js --plugins @babel/plugin-transform-block-scoping --plugins @babel/plugin-transform-arrow-functions</code>
+
+```
+👉🏻 "use strict";
+
+var alert = function (msg) {
+  return window.alert(msg);
+};
+```
+
+이렇게 use strict가 찍히면서 엄격모드로 변환된 것이 나타난다 !
+그리고 <code>npx babel app.js --plugins @babel/plugin-transform-block-scoping --plugins @babel/plugin-transform-arrow-functions</code> 이렇게 커맨드라인 명령어가 점점 길어지기 때문에 설정 파일로 분리하는 것이 좋을 거 같다. 이것도 웹팩 webpack.config 를 기본 설정파일로 사용하듯 바벨도 babel.config.js를 사용한다.
+
+```
+📚 [babel.config.js] 파일 코드입니다.
+
+module.exports = {
+  plugins: [
+    "@babel/plugin-transform-block-scoping",
+    "@babel/plugin-transform-arrow-functions",
+    "@babel/plugin-transform-strict-mode",
+  ],
+};
+```
+
+바벨 기본 설정파일을 만들어서 설치한 플러그인들을 담아두면 커멘드 창에 <code>npx babel app.js</code> 만 입력해도 알아서 전부 동작된다.
+
+## 프리셋
+
+목적에 맞게 여러가지 플러그인을 세트로 모아놓은 것을 프리셋이라고 한다.
+
+### 커스텀 프리셋
+
+[my-babel-preset.js] 라는 파일을 만들어서 여기에 설치했던 플러그인들을 담아놓는다.
+
+```
+module.exports = function myBabelPreset() {
+  return {
+    Plugins: [
+      "@babel/plugin-transform-block-scoping",
+      "@babel/plugin-transform-arrow-functions",
+      "@babel/plugin-transform-strict-mode",
+    ],
+  };
+};
+
+```
+
+그리고 기존에 [babel.config.js] 파일에는
+
+```
+module.exports = {
+  presets: ["./my-babel-preset.js"],
+};
+```
+
+my-babel-preset.js를 프리셋 해준다. 그러면 프리셋에 있는 모든 플러그인들이 실행된다.
+
+## 마무리
+
+사실 이렇게 바벨을 사용하는 것은 실무에서는 잘 쓰지 않는다. 그냥 바벨을 좀 더 이해하기 위한 시행이다.
+
+---
+
+## 바벨 웹팩 실무
+
+### 프리셋 사용하기
+
+- preset-env : 이크마스크립트2015+ 를 변환할 때 사용한다. (인터넷 익스플로러 지원하려면 es5 사용해야 돼서 변환이 필요하다.)
+  > babel-reset-ex2015~latest까지 지금은 env 하나로 합쳐졌다.
+- preset-flow, preset-react, preset-typescript 는 flow, 리액트, ts를 변환하기 위한 프리셋이다.
+
+```
+$npm install -D @babel/preset-env
+```
+
+### 타겟 브라우저
+
+특정 브라우저에 지원하는 코드를 말한다. target 옵션에 브라우저 버전명만 지정하면 env 프리셋은 이에 맞는 플러그인들을 찾아 최적의 코드를 출력해 낸다.
+
+> https://caniuse.com/
+
+특정 기능들을 브라우저에서 지원 해주는지 보려면 caniuse 라는 사이트에서 검색함 된다.
+
+```
+module.exports = {
+  presets: [
+    [
+      "@babel/preset-env",
+      {
+        targets: {
+          chrome: "79",
+          ie: "11",
+        },
+      },
+    ],
+  ],
+};
+```
+
+이렇게 target에다가 브라우저를 지정한다. 그리고 커맨드 창에 명령어를 입력했을 때
+
+```
+👉🏻 타겟 지정 해주기 전
+ihyeonjuui-MacBookAir:fn_dev_env leehyunju$ npx babel app.js
+"use strict";
+
+const alert = msg => window.alert(msg);
+
+👉🏻 타겟 지정 해준 후
+ihyeonjuui-MacBookAir:fn_dev_env leehyunju$ npx babel app.js
+"use strict";
+
+var alert = function alert(msg) {
+  return window.alert(msg);
+};
+```
+
+바로 const에서 var로 변환된 것을 확인 할 수 있다.
