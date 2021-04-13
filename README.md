@@ -562,3 +562,66 @@ module.exports = {
 <img width="375" alt="스크린샷 2021-04-13 오후 7 44 08" src="https://user-images.githubusercontent.com/71499150/114540592-aefd6d80-9c90-11eb-997a-689f08866686.png">
 
 eslintrc.js 파일에 환경이 세팅되어있는 모습을 확인 할 수 있다.
+
+<img width="224" alt="스크린샷 2021-04-13 오후 7 54 57" src="https://user-images.githubusercontent.com/71499150/114541966-516a2080-9c92-11eb-9225-856cd0906031.png">
+
+이건 package.json 에서 script 부분에 lint를 추가해줬다. 실행하고 싶으면 <code>npm run eslint</code>를 하면된다. 그리고 src는 src 폴더에 있는 모든 파일들을 검사해주는 것이고 --fix는 자동으로 오류들을 고쳐주는 명령어다.
+
+<img width="663" alt="스크린샷 2021-04-13 오후 7 55 09" src="https://user-images.githubusercontent.com/71499150/114542253-aad24f80-9c92-11eb-8576-4683ace499e5.png">
+
+eslint를 실행해보니 위에같은 오류들이 나타났는데 여기서
+<code>10:7 warning 'foo' is assigned a value but never used @typescript-eslint/no-unused-vars</code> 이 에러는 사용하지 않는 변수라 코드품질에 좋지 않다는 뜻이다.
+
+---
+
+## Prettier
+
+> 코드를 더 예쁘게 해주고 코드 품질을 담당한다. eslint의 formating 부분을 좀 더 강화한 버전이다. 그리고 eslint가 고쳐줄 수 없는 부분들도 자동으로 고쳐준다.
+
+```
+$npm i prettier
+```
+
+## Prettier + eslint 통합방법
+
+```
+$npm i eslint-config-prettier
+```
+
+프리티어는 eslint와 통합하는 것을 제공한다. 규칙이 충돌되면 안되어서 이런 것을 방지해주기 위해 나온 것이 eslint-config-prettier 이다.
+
+```
+ extends: [
+    "eslint:recommended",
+👉🏻 "eslint-config-prettier",
+    (...)
+```
+
+추가해주자! 그럼 eslint와 겹치는 규칙들은 off 시켜 충돌 방지한다. 그리고 이것들을 실행시킬 때는 커맨드 창에 eslint 따로 prettier 따로 run 해줘야하는데, 한 번에 돌려주는 플러그인이 존재한다.
+
+```
+$npm i eslint-plugin-prettier
+```
+
+바로 이거다.
+
+```
+👉🏻[.eslintrc.js]
+
+ plugins: ["react", "@typescript-eslint", "prettier"],
+  rules: {
+    "prettier/prettier": "error", // 규칙을 위반하면 에러를 반환하도록
+  },
+```
+
+이렇게 플러그인이랑 규칙들을 설정해조야함
+
+```
+  extends: [
+    "eslint:recommended",
+    "eslint-config-prettier",
+    "plugin:prettier/recommended",
+    "plugin:@typescript-eslint/recommended",
+  ],
+```
+extends 부분에다가도 <code>"plugin:prettier/recommended",</code> 추가해주기
