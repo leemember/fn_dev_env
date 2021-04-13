@@ -1,7 +1,7 @@
 const path = require("path");
 const webpack = require("webpack");
 const childProcess = require("child_process");
-const HtmlWebpackPlugin = require("html-webpack-plugin");
+// const HtmlWebpackPlugin = require("html-webpack-plugin");
 const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 
@@ -10,7 +10,7 @@ module.exports = {
   mode: "development",
   //시작점
   entry: {
-    main: "./src/app.js",
+    main: "./app.js",
   },
   //path: 아웃풋 디렉토리명을 입력한다. (절대경로)
   output: {
@@ -35,6 +35,13 @@ module.exports = {
           limit: 20000, //파일 용량도 설정이 가능하다 2kb
         },
       },
+      {
+        //js관련 파일들은 바벨 로더 동작시키기
+        test: /\.js$/,
+        loader: "babel-loader",
+        //node_modules 바벨로더 처리 안되게 제외시키기 (exclude)
+        exclude: "/node_modules/",
+      },
     ],
   },
   plugins: [
@@ -50,20 +57,20 @@ module.exports = {
       TWO: JSON.stringify("1+1"),
       "api.domain": JSON.stringify("http://dev.api.domain.com"),
     }),
-    new HtmlWebpackPlugin({
-      template: "./src/index.html",
-      templateParameters: {
-        env: process.env.NODE_ENV === "development" ? "(개발용)" : "",
-      },
-      //불필요한 용량들을 제거해주는거
-      minify:
-        process.env.NODE_ENV === "procution"
-          ? {
-              collapseWhitespace: true, //빈칸 제거
-              removeComments: true, //주석 제거
-            }
-          : false,
-    }),
+    // new HtmlWebpackPlugin({
+    //   template: "./src/index.html",
+    //   templateParameters: {
+    //     env: process.env.NODE_ENV === "development" ? "(개발용)" : "",
+    //   },
+    //   //불필요한 용량들을 제거해주는거
+    //   minify:
+    //     process.env.NODE_ENV === "procution"
+    //       ? {
+    //           collapseWhitespace: true, //빈칸 제거
+    //           removeComments: true, //주석 제거
+    //         }
+    //       : false,
+    // }),
     new MiniCssExtractPlugin({ filename: "[name].css" }),
 
     new CleanWebpackPlugin(),

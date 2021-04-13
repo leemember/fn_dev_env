@@ -387,4 +387,77 @@ var alert = function alert(msg) {
 };
 ```
 
-바로 const에서 var로 변환된 것을 확인 할 수 있다.
+바로 const에서 var로 변환된 것을 확인 할 수 있다. 이렇게 블록 스코핑을 함수 스코핑으로 그리고 화살표 함수도 일반 함수로 대체할 수 있지만, Promise는 es5 함수 스코핑으로 대체할 수 없다 ! 근데 es5버전으로 구현할 수는 있다.
+
+이걸 구현해주는 것이 바로
+
+### 폴리필
+
+```
+module.exports = {
+  presets: [
+    [
+      "@babel/preset-env",
+      {
+        targets: {
+          chrome: "79",
+          ie: "11",
+        },
+        👉🏻 useBuiltIns: "usage", // 폴리필 사용 방식 지정 'entry' , false
+        👉🏻 corejs: {
+          // 폴리필 버전 지정
+          version: 2, // 최신버전은 3이지만 문서에는 2라서 2라함
+        },
+      },
+    ],
+  ],
+};
+```
+
+바벨 기본환경에 폴리필을 설정한 뒤에 <code>npx babel app.js</code> 을 실행시켜보면
+
+```
+"use strict";
+
+require("core-js/modules/es6.object.to-string.js");
+
+require("core-js/modules/es6.promise.js");
+
+new Promise();
+```
+
+이런 커맨드가 뜨는데 core-js 모듈에 새롭게 생성되었다는 뜻이다.
+
+## 웹팩으로 통합
+
+실무환경에서는 바벨을 직접 터미널에서 빌드하여 사용하는 것보다 웹팩을 통합해서 사용하는 것이 일반적이다. babel-loader로 제공해준다. (위에 내용처럼 안해도 되고 그냥 babel-loader 하나 설치해주고 웹팩 설정환경에 넣어주고 번들링해주면 된다.)
+
+```
+$npm i -D babel-loader
+```
+
+그리고 웹팩 환경 설정 파일에 바벨 로더를 추가해준다.
+
+```
+{
+        //js관련 파일들은 바벨 로더 동작시키기
+        test: /\.js$/,
+        loader: "babel-loader",
+        //node_modules 바벨로더 처리 안되게 제외시키기 (exclude)
+        exclude: "/node_modules/",
+      },
+```
+
+이렇게 하고 <code>npm run build</code> 시키면
+Module not found: Error: Can't resolve 'core-js/modules/es6.object.to-string.js' in '/Users/leehyunju/Documents/React/fn_dev_env'
+@ ./app.js 1:0-49 이런 에러가 뜬다. 이건 core-js라는 모듈을 찾을 수 없다는 것이고 core-js를 설치해주면 된다.
+
+```
+npm i core-js@2
+```
+
+특정 버전을 설치해주고 싶으면 @골뱅이 뒤에 버전 수 적기
+
+## 마무리
+
+바벨은 다양한 브라우저에서 돌아가는 어플리케이션을 만들기 위한 도구다 (크롬은 거의 es6를 읽어내지만 인터넷 익스플로어에서는 지원하지 않아서 이전 버전 함수로 변환해준다고 보면 된다.) 그리고 바벨의 코어는 파싱과 출력만 담당하고 변환 작업은 플러그인이 처리한다. 여러개 플러그인을 모아놓은 세트를 **프리셋**이라 하고, 환경은 env 프리셋을 사용한다. 바벨이 변환하지 못하는 코드는 폴리필이라 부르는 코드조각을 불러와 결과물을 로딩해서 해결한다. babel-loader로 웹팩과 함께 사용하면 훨씬 단순하고 자동화된 프론트엔드 개발환경을 갖출 수 있다.
